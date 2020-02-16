@@ -43,10 +43,9 @@ jobs:
         make deps
 
     - name: Run test block
-      #env:
-      #  TEST_BLOCK: ${{ matrix.test_block }}
+      env:
+        TEST_BLOCK: ${{ matrix.test_block }}
       # TODO: workaround: https://github.com/actions/setup-go/issues/14
       run: |
         export PATH=$PATH:$(go env GOPATH)/bin
-        #make test
-        TEST_BLOCK="${{ matrix.test_block }}" make test # this works too!
+        make test
