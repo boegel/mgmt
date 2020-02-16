@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -22,8 +22,6 @@ import (
 	"log"
 	"os"
 	"time"
-
-	"github.com/coreos/pkg/capnslog"
 )
 
 func hello(program, version string, flags Flags) {
@@ -36,20 +34,13 @@ func hello(program, version string, flags Flags) {
 	logFlags = logFlags - log.Ldate // remove the date for now
 	log.SetFlags(logFlags)
 
-	// un-hijack from capnslog...
-	// XXX: move this to the etcd package when new version deprecates capnslog
 	log.SetOutput(os.Stderr)
-	if flags.Verbose {
-		capnslog.SetFormatter(capnslog.NewLogFormatter(os.Stderr, "(etcd) ", logFlags))
-	} else {
-		capnslog.SetFormatter(capnslog.NewNilFormatter())
-	}
 
 	if program == "" {
 		program = "<unknown>"
 	}
 	fmt.Println(fmt.Sprintf("This is: %s, version: %s", program, version))
-	fmt.Println("Copyright (C) 2013-2019+ James Shubin and the project contributors")
+	fmt.Println("Copyright (C) 2013-2020+ James Shubin and the project contributors")
 	fmt.Println("Written by James Shubin <james@shubin.ca> and the project contributors")
 	log.Printf("main: start: %v", start)
 }

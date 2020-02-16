@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@ import (
 
 	"github.com/purpleidea/mgmt/etcd/interfaces"
 
-	etcd "github.com/coreos/etcd/clientv3"
-	etcdtypes "github.com/coreos/etcd/pkg/types"
+	etcd "go.etcd.io/etcd/clientv3"
+	etcdtypes "go.etcd.io/etcd/pkg/types"
 )
 
 // XXX: Test causing cluster shutdowns with:

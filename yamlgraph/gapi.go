@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -93,8 +93,8 @@ func (obj *GAPI) Cli(cliInfo *gapi.CliInfo) (*gapi.Deploy, error) {
 
 	return &gapi.Deploy{
 		Name: Name,
-		Noop: c.GlobalBool("noop"),
-		Sema: c.GlobalInt("sema"),
+		Noop: c.Bool("noop"),
+		Sema: c.Int("sema"),
 		GAPI: &GAPI{
 			InputURI: fs.URI(),
 			// TODO: add properties here...

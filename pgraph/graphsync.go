@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -38,10 +38,10 @@ func strEdgeCmpFn(e1, e2 Edge) (bool, error) {
 }
 
 // GraphSync updates the Graph so that it matches the newGraph. It leaves
-// identical elements alone so that they don't need to be refreshed.
-// It tries to mutate existing elements into new ones, if they support this.
-// This updates the Graph on success only. If it fails, then the graph won't
-// have been modified.
+// identical elements alone so that they don't need to be refreshed. It tries to
+// mutate existing elements into new ones, if they support this. This updates
+// the Graph on success only. If it fails, then the graph won't have been
+// modified.
 // FIXME: should we do this with copies of the vertex resources?
 func (obj *Graph) GraphSync(newGraph *Graph, vertexCmpFn func(Vertex, Vertex) (bool, error), vertexAddFn func(Vertex) error, vertexRemoveFn func(Vertex) error, edgeCmpFn func(Edge, Edge) (bool, error)) error {
 	oldGraph := obj.Copy() // work on a copy of the old graph

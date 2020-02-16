@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,9 +23,9 @@ import (
 	"github.com/purpleidea/mgmt/etcd/scheduler"
 )
 
-// World is an interface to the rest of the different graph state. It allows
-// the GAPI to store state and exchange information throughout the cluster. It
-// is the interface each machine uses to communicate with the rest of the world.
+// World is an interface to the rest of the different graph state. It allows the
+// GAPI to store state and exchange information throughout the cluster. It is
+// the interface each machine uses to communicate with the rest of the world.
 type World interface { // TODO: is there a better name for this interface?
 	ResWatch(context.Context) (chan error, error)
 	ResExport(context.Context, []Res) error

@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -271,8 +271,8 @@ func (obj *GroupUID) IFF(uid engine.ResUID) bool {
 	return true
 }
 
-// UIDs includes all params to make a unique identification of this object.
-// Most resources only return one, although some resources can return multiple.
+// UIDs includes all params to make a unique identification of this object. Most
+// resources only return one, although some resources can return multiple.
 func (obj *GroupRes) UIDs() []engine.ResUID {
 	x := &GroupUID{
 		BaseUID: engine.BaseUID{Name: obj.Name(), Kind: obj.Kind()},
@@ -282,8 +282,8 @@ func (obj *GroupRes) UIDs() []engine.ResUID {
 	return []engine.ResUID{x}
 }
 
-// UnmarshalYAML is the custom unmarshal handler for this struct.
-// It is primarily useful for setting the defaults.
+// UnmarshalYAML is the custom unmarshal handler for this struct. It is
+// primarily useful for setting the defaults.
 func (obj *GroupRes) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type rawRes GroupRes // indirection to avoid infinite recursion
 

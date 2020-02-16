@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -35,16 +35,46 @@ import (
 	"github.com/purpleidea/mgmt/engine"
 	"github.com/purpleidea/mgmt/engine/traits"
 	engineUtil "github.com/purpleidea/mgmt/engine/util"
+	"github.com/purpleidea/mgmt/lang/funcs/vars"
+	"github.com/purpleidea/mgmt/lang/interfaces"
+	"github.com/purpleidea/mgmt/lang/types"
 	"github.com/purpleidea/mgmt/recwatch"
 	"github.com/purpleidea/mgmt/util"
 	"github.com/purpleidea/mgmt/util/errwrap"
 )
 
 func init() {
-	engine.RegisterResource("file", func() engine.Res { return &FileRes{} })
+	engine.RegisterResource(KindFile, func() engine.Res { return &FileRes{} })
+
+	// const.res.file.state.exists = "exists"
+	// const.res.file.state.absent = "absent"
+	vars.RegisterResourceParams(KindFile, map[string]map[string]func() interfaces.Var{
+		ParamFileState: {
+			FileStateExists: func() interfaces.Var {
+				return &types.StrValue{
+					V: FileStateExists,
+				}
+			},
+			FileStateAbsent: func() interfaces.Var {
+				return &types.StrValue{
+					V: FileStateAbsent,
+				}
+			},
+			// TODO: consider removing this field entirely
+			"undefined": func() interfaces.Var {
+				return &types.StrValue{
+					V: FileStateUndefined, // empty string
+				}
+			},
+		},
+	})
 }
 
 const (
+	// KindFile is the kind string used to identify this resource.
+	KindFile = "file"
+	// ParamFileState is the name of the state field parameter.
+	ParamFileState = "state"
 	// FileStateExists is the string that represents that the file should be
 	// present.
 	FileStateExists = "exists"
@@ -62,8 +92,8 @@ const (
 	FileModeAllowAssign = false
 )
 
-// FileRes is a file and directory resource. Dirs are defined by names ending
-// in a slash.
+// FileRes is a file and directory resource. Dirs are defined by names ending in
+// a slash.
 type FileRes struct {
 	traits.Base // add the base methods without re-implementation
 	traits.Edgeable
@@ -324,11 +354,11 @@ func (obj *FileRes) Close() error {
 	return nil
 }
 
-// Watch is the primary listener for this resource and it outputs events.
-// This one is a file watcher for files and directories.
-// Modify with caution, it is probably important to write some test cases first!
-// If the Watch returns an error, it means that something has gone wrong, and it
-// must be restarted. On a clean exit it returns nil.
+// Watch is the primary listener for this resource and it outputs events. This
+// one is a file watcher for files and directories. Modify with caution, it is
+// probably important to write some test cases first! If the Watch returns an
+// error, it means that something has gone wrong, and it must be restarted. On a
+// clean exit it returns nil.
 func (obj *FileRes) Watch() error {
 	// TODO: chan *recwatch.Event instead?
 	inputEvents := make(chan recwatch.Event)
@@ -975,7 +1005,7 @@ func (obj *FileRes) sourceCheckApply(apply bool) (bool, error) {
 				// programming error
 				return false, fmt.Errorf("not a Res")
 			}
-			if res.Kind() != "file" {
+			if res.Kind() != KindFile {
 				continue // only interested in files
 			}
 			if res.Name() == obj.Name() {
@@ -1322,7 +1352,8 @@ func (obj *FileResAutoEdges) Next() []engine.ResUID {
 	return []engine.ResUID{value} // we return one, even though api supports N
 }
 
-// Test gets results of the earlier Next() call, & returns if we should continue!
+// Test gets results of the earlier Next() call, & returns if we should
+// continue!
 func (obj *FileResAutoEdges) Test(input []bool) bool {
 	// We do all of these first...
 	if !obj.fdone && len(obj.frags) > 0 {
@@ -1390,8 +1421,8 @@ func (obj *FileRes) AutoEdges() (engine.AutoEdge, error) {
 	}, nil
 }
 
-// UIDs includes all params to make a unique identification of this object.
-// Most resources only return one, although some resources can return multiple.
+// UIDs includes all params to make a unique identification of this object. Most
+// resources only return one, although some resources can return multiple.
 func (obj *FileRes) UIDs() []engine.ResUID {
 	x := &FileUID{
 		BaseUID: engine.BaseUID{Name: obj.Name(), Kind: obj.Kind()},
@@ -1417,8 +1448,8 @@ func (obj *FileRes) CollectPattern(pattern string) {
 	obj.Dirname = pattern // XXX: simplistic for now
 }
 
-// UnmarshalYAML is the custom unmarshal handler for this struct.
-// It is primarily useful for setting the defaults.
+// UnmarshalYAML is the custom unmarshal handler for this struct. It is
+// primarily useful for setting the defaults.
 func (obj *FileRes) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type rawRes FileRes // indirection to avoid infinite recursion
 
@@ -1581,7 +1612,7 @@ func (obj *FileRes) Reversed() (engine.ReversibleRes, error) {
 func (obj *FileRes) GraphQueryAllowed(opts ...engine.GraphQueryableOption) error {
 	options := &engine.GraphQueryableOptions{} // default options
 	options.Apply(opts...)                     // apply the options
-	if options.Kind != "file" {
+	if options.Kind != KindFile {
 		return fmt.Errorf("only other files can access my information")
 	}
 	return nil

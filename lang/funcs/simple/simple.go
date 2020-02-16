@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -140,6 +140,7 @@ func (obj *WrappedFunc) Stream() error {
 				return errwrap.Wrapf(err, "simple function errored")
 			}
 
+			// TODO: do we want obj.result to be a pointer instead?
 			if obj.result == result {
 				continue // result didn't change
 			}

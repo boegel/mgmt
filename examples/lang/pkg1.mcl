@@ -1,3 +1,6 @@
+import "os"
+
 pkg "cowsay" {
 	state => "installed",
+	allowunsupported => os.is_debian() ?: true,
 }

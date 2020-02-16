@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -41,12 +41,12 @@ type ReadFileFunc struct {
 	init *interfaces.Init
 	last types.Value // last value received to use for diff
 
-	filename   string // the active filename
+	filename   *string // the active filename
 	recWatcher *recwatch.RecWatcher
 	events     chan error // internal events
 	wg         *sync.WaitGroup
 
-	result string // last calculated output
+	result *string // last calculated output
 
 	closeChan chan struct{}
 }
@@ -112,10 +112,11 @@ func (obj *ReadFileFunc) Stream() error {
 
 			filename := input.Struct()["filename"].Str()
 			// TODO: add validation for absolute path?
-			if filename == obj.filename {
+			// TODO: add check for empty string
+			if obj.filename != nil && *obj.filename == filename {
 				continue // nothing changed
 			}
-			obj.filename = filename
+			obj.filename = &filename
 
 			if obj.recWatcher != nil {
 				obj.recWatcher.Close() // close previous watcher
@@ -123,7 +124,7 @@ func (obj *ReadFileFunc) Stream() error {
 			}
 			// create new watcher
 			obj.recWatcher = &recwatch.RecWatcher{
-				Path:    obj.filename,
+				Path:    *obj.filename,
 				Recurse: false,
 				Flags: recwatch.Flags{
 					// TODO: add Logf
@@ -189,16 +190,16 @@ func (obj *ReadFileFunc) Stream() error {
 			}
 
 			// read file...
-			content, err := ioutil.ReadFile(obj.filename)
+			content, err := ioutil.ReadFile(*obj.filename)
 			if err != nil {
 				return errwrap.Wrapf(err, "error reading file")
 			}
 			result := string(content) // convert to string
 
-			if obj.result == result {
+			if obj.result != nil && *obj.result == result {
 				continue // result didn't change
 			}
-			obj.result = result // store new result
+			obj.result = &result // store new result
 
 		case <-obj.closeChan:
 			return nil
@@ -206,7 +207,7 @@ func (obj *ReadFileFunc) Stream() error {
 
 		select {
 		case obj.init.Output <- &types.StrValue{
-			V: obj.result,
+			V: *obj.result,
 		}:
 		case <-obj.closeChan:
 			return nil

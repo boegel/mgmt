@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -90,8 +90,8 @@ func AutoEdge(graph *pgraph.Graph, debug bool, logf func(format string, v ...int
 		}
 	}
 
-	// It would be great to ensure we didn't add any loops here, but instead
-	// of checking now, we'll move the check into the main loop.
+	// It would be great to ensure we didn't add any graph cycles here, but
+	// instead of checking now, we'll move the check into the main loop.
 	return nil
 }
 

@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -3073,9 +3073,10 @@ func (obj *StmtProg) importSystemScope(name string) (*interfaces.Scope, error) {
 
 	// initial scope, built from core golang code
 	scope := &interfaces.Scope{
-		// TODO: we could add core API's for variables and classes too!
+		// TODO: we could use the core API for variables somehow...
 		//Variables: make(map[string]interfaces.Expr),
-		Functions: funcs, // map[string]Expr
+		Functions: funcs, // map[string]interfaces.Expr
+		// TODO: we could add a core API for classes too!
 		//Classes: make(map[string]interfaces.Stmt),
 	}
 
@@ -4459,8 +4460,8 @@ func (obj *StmtInclude) Graph() (*pgraph.Graph, error) {
 	return graph, nil
 }
 
-// Output returns the output that this include produces. This output is what
-// is used to build the output graph. This only exists for statements. The
+// Output returns the output that this include produces. This output is what is
+// used to build the output graph. This only exists for statements. The
 // analogous function for expressions is Value. Those Value functions might get
 // called by this Output function if they are needed to produce the output. The
 // ultimate source of this output comes from the previously defined StmtClass
@@ -4550,8 +4551,8 @@ func (obj *StmtImport) Graph() (*pgraph.Graph, error) {
 	return graph, errwrap.Wrapf(err, "could not create graph")
 }
 
-// Output returns the output that this include produces. This output is what
-// is used to build the output graph. This only exists for statements. The
+// Output returns the output that this include produces. This output is what is
+// used to build the output graph. This only exists for statements. The
 // analogous function for expressions is Value. Those Value functions might get
 // called by this Output function if they are needed to produce the output. This
 // import statement itself produces no output, as it is only used to populate
@@ -4827,10 +4828,12 @@ func (obj *ExprBool) SetScope(scope *interfaces.Scope) error {
 }
 
 // SetType will make no changes if called here. It will error if anything other
-// than a Bool is passed in, and doesn't need to be called for this expr to work.
+// than a Bool is passed in, and doesn't need to be called for this expr to
+// work.
 func (obj *ExprBool) SetType(typ *types.Type) error { return types.TypeBool.Cmp(typ) }
 
-// Type returns the type of this expression. This method always returns Bool here.
+// Type returns the type of this expression. This method always returns Bool
+// here.
 func (obj *ExprBool) Type() (*types.Type, error) { return types.TypeBool, nil }
 
 // Unify returns the list of invariants that this node produces. It recursively
@@ -4919,9 +4922,8 @@ func (obj *ExprStr) Init(data *interfaces.Data) error {
 // generally increases the size of the AST when it is used. It calls Interpolate
 // on any child elements and builds the new node with those new node contents.
 // Here it attempts to expand the string if there are any internal variables
-// which need interpolation. If any are found, it returns a larger AST which
-// has a function which returns a string as its root. Otherwise it returns
-// itself.
+// which need interpolation. If any are found, it returns a larger AST which has
+// a function which returns a string as its root. Otherwise it returns itself.
 func (obj *ExprStr) Interpolate() (interfaces.Expr, error) {
 	pos := &Pos{
 		// column/line number, starting at 1
@@ -4997,10 +4999,12 @@ func (obj *ExprStr) SetScope(scope *interfaces.Scope) error {
 }
 
 // SetType will make no changes if called here. It will error if anything other
-// than an Str is passed in, and doesn't need to be called for this expr to work.
+// than an Str is passed in, and doesn't need to be called for this expr to
+// work.
 func (obj *ExprStr) SetType(typ *types.Type) error { return types.TypeStr.Cmp(typ) }
 
-// Type returns the type of this expression. This method always returns Str here.
+// Type returns the type of this expression. This method always returns Str
+// here.
 func (obj *ExprStr) Type() (*types.Type, error) { return types.TypeStr, nil }
 
 // Unify returns the list of invariants that this node produces. It recursively
@@ -5121,10 +5125,12 @@ func (obj *ExprInt) SetScope(scope *interfaces.Scope) error {
 }
 
 // SetType will make no changes if called here. It will error if anything other
-// than an Int is passed in, and doesn't need to be called for this expr to work.
+// than an Int is passed in, and doesn't need to be called for this expr to
+// work.
 func (obj *ExprInt) SetType(typ *types.Type) error { return types.TypeInt.Cmp(typ) }
 
-// Type returns the type of this expression. This method always returns Int here.
+// Type returns the type of this expression. This method always returns Int
+// here.
 func (obj *ExprInt) Type() (*types.Type, error) { return types.TypeInt, nil }
 
 // Unify returns the list of invariants that this node produces. It recursively
@@ -5247,10 +5253,12 @@ func (obj *ExprFloat) SetScope(scope *interfaces.Scope) error {
 }
 
 // SetType will make no changes if called here. It will error if anything other
-// than a Float is passed in, and doesn't need to be called for this expr to work.
+// than a Float is passed in, and doesn't need to be called for this expr to
+// work.
 func (obj *ExprFloat) SetType(typ *types.Type) error { return types.TypeFloat.Cmp(typ) }
 
-// Type returns the type of this expression. This method always returns Float here.
+// Type returns the type of this expression. This method always returns Float
+// here.
 func (obj *ExprFloat) Type() (*types.Type, error) { return types.TypeFloat, nil }
 
 // Unify returns the list of invariants that this node produces. It recursively
@@ -9052,7 +9060,6 @@ func (obj *ExprIf) Value() (types.Value, error) {
 // getScope pulls the local stored scope out of an Expr, without needing to add
 // a similarly named method to the Expr interface. This is private and not part
 // of the interface, because it is only used internally.
-// is only used
 // TODO: we could extend this to include Stmt's if it was ever useful
 func getScope(node interfaces.Expr) (*interfaces.Scope, error) {
 	//if _, ok := node.(interfaces.Expr); !ok {

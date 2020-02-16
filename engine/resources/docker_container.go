@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -50,8 +50,8 @@ const (
 	// initCtxTimeout is the length of time, in seconds, before requests are
 	// cancelled in Init.
 	initCtxTimeout = 20
-	// checkApplyCtxTimeout is the length of time, in seconds, before requests
-	// are cancelled in CheckApply.
+	// checkApplyCtxTimeout is the length of time, in seconds, before
+	// requests are cancelled in CheckApply.
 	checkApplyCtxTimeout = 120
 )
 
@@ -74,11 +74,12 @@ type DockerContainerRes struct {
 	Env []string `yaml:"env"`
 	// Ports is a map of port bindings. E.g. {"tcp" => {80 => 8080},}.
 	Ports map[string]map[int64]int64 `yaml:"ports"`
-	// APIVersion allows you to override the host's default client API version.
+	// APIVersion allows you to override the host's default client API
+	// version.
 	APIVersion string `yaml:"apiversion"`
 
-	// Force, if true, will destroy and redeploy the container if the image is
-	// incorrect.
+	// Force, if true, this will destroy and redeploy the container if the
+	// image is incorrect.
 	Force bool `yaml:"force"`
 
 	client *client.Client // docker api client
@@ -88,7 +89,9 @@ type DockerContainerRes struct {
 
 // Default returns some sensible defaults for this resource.
 func (obj *DockerContainerRes) Default() engine.Res {
-	return &DockerContainerRes{}
+	return &DockerContainerRes{
+		State: "running",
+	}
 }
 
 // Validate if the params passed in are valid data.
@@ -96,6 +99,11 @@ func (obj *DockerContainerRes) Validate() error {
 	// validate state
 	if obj.State != ContainerRunning && obj.State != ContainerStopped && obj.State != ContainerRemoved {
 		return fmt.Errorf("state must be running, stopped or removed")
+	}
+
+	// make sure an image is specified
+	if obj.Image == "" {
+		return fmt.Errorf("image must be specified")
 	}
 
 	// validate env
@@ -367,52 +375,105 @@ func (obj *DockerContainerRes) Cmp(r engine.Res) error {
 	if !ok {
 		return fmt.Errorf("error casting r to *DockerContainerRes")
 	}
-	if obj.Name() != res.Name() {
-		return fmt.Errorf("names differ")
+
+	if obj.State != res.State {
+		return fmt.Errorf("the State differs")
+	}
+	if obj.Image != res.Image {
+		return fmt.Errorf("the Image differs")
 	}
 	if err := util.SortedStrSliceCompare(obj.Cmd, res.Cmd); err != nil {
-		return errwrap.Wrapf(err, "cmd differs")
+		return errwrap.Wrapf(err, "the Cmd field differs")
 	}
 	if err := util.SortedStrSliceCompare(obj.Env, res.Env); err != nil {
-		return errwrap.Wrapf(err, "env differs")
+		return errwrap.Wrapf(err, "tne Env field differs")
 	}
 	if len(obj.Ports) != len(res.Ports) {
-		return fmt.Errorf("ports length differs")
+		return fmt.Errorf("the Ports length differs")
 	}
 	for k, v := range obj.Ports {
 		for p, q := range v {
 			if w, ok := res.Ports[k][p]; !ok || q != w {
-				return fmt.Errorf("ports differ")
+				return fmt.Errorf("the Ports field differs")
 			}
 		}
 	}
 	if obj.APIVersion != res.APIVersion {
-		return fmt.Errorf("apiversions differ")
+		return fmt.Errorf("the APIVersion differs")
 	}
 	if obj.Force != res.Force {
-		return fmt.Errorf("forces differ")
+		return fmt.Errorf("the Force field differs")
 	}
 	return nil
 }
 
-// DockerUID is the UID struct for DockerContainerRes.
-type DockerUID struct {
+// DockerContainerUID is the UID struct for DockerContainerRes.
+type DockerContainerUID struct {
 	engine.BaseUID
+
 	name string
 }
 
-// UIDs includes all params to make a unique identification of this object.
-// Most resources only return one, although some resources can return multiple.
+// DockerContainerResAutoEdges holds the state of the auto edge generator.
+type DockerContainerResAutoEdges struct {
+	UIDs    []engine.ResUID
+	pointer int
+}
+
+// AutoEdges returns edges to any docker:image resource that matches the image
+// specified in the docker:container resource definition.
+func (obj *DockerContainerRes) AutoEdges() (engine.AutoEdge, error) {
+	var result []engine.ResUID
+	var reversed bool
+	if obj.State != "removed" {
+		reversed = true
+	}
+	result = append(result, &DockerImageUID{
+		BaseUID: engine.BaseUID{
+			Reversed: &reversed,
+		},
+		image: dockerImageNameTag(obj.Image),
+	})
+	return &DockerContainerResAutoEdges{
+		UIDs:    result,
+		pointer: 0,
+	}, nil
+}
+
+// Next returnes the next automatic edge.
+func (obj *DockerContainerResAutoEdges) Next() []engine.ResUID {
+	if len(obj.UIDs) == 0 {
+		return nil
+	}
+	value := obj.UIDs[obj.pointer]
+	obj.pointer++
+	return []engine.ResUID{value}
+}
+
+// Test gets results of the earlier Next() call, & returns if we should
+// continue.
+func (obj *DockerContainerResAutoEdges) Test(input []bool) bool {
+	if len(obj.UIDs) <= obj.pointer {
+		return false
+	}
+	if len(input) != 1 { // in case we get given bad data
+		panic(fmt.Sprintf("Expecting a single value!"))
+	}
+	return true // keep going
+}
+
+// UIDs includes all params to make a unique identification of this object. Most
+// resources only return one, although some resources can return multiple.
 func (obj *DockerContainerRes) UIDs() []engine.ResUID {
-	x := &DockerUID{
+	x := &DockerContainerUID{
 		BaseUID: engine.BaseUID{Name: obj.Name(), Kind: obj.Kind()},
 		name:    obj.Name(),
 	}
 	return []engine.ResUID{x}
 }
 
-// UnmarshalYAML is the custom unmarshal handler for this struct.
-// It is primarily useful for setting the defaults.
+// UnmarshalYAML is the custom unmarshal handler for this struct. It is
+// primarily useful for setting the defaults.
 func (obj *DockerContainerRes) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type rawRes DockerContainerRes // indirection to avoid infinite recursion
 

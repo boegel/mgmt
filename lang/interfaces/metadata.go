@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -225,9 +225,9 @@ func ParseMetadata(reader io.Reader) (*Metadata, error) {
 	return metadata, nil
 }
 
-// FindModulesPath returns an absolute path to the Path dir where modules can
-// be found. This can vary, because the current metadata file might not specify
-// a Path value, meaning we'd have to return the global modules path.
+// FindModulesPath returns an absolute path to the Path dir where modules can be
+// found. This can vary, because the current metadata file might not specify a
+// Path value, meaning we'd have to return the global modules path.
 // Additionally, we can search upwards for a path if our metadata file allows
 // this. It searches with respect to the calling base directory, and uses the
 // ParentPathBlock field to determine if we're allowed to search upwards. It

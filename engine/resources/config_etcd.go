@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -229,8 +229,8 @@ func (obj *ConfigEtcdRes) Interrupt() error {
 	return nil
 }
 
-// UnmarshalYAML is the custom unmarshal handler for this struct.
-// It is primarily useful for setting the defaults.
+// UnmarshalYAML is the custom unmarshal handler for this struct. It is
+// primarily useful for setting the defaults.
 func (obj *ConfigEtcdRes) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type rawRes ConfigEtcdRes // indirection to avoid infinite recursion
 

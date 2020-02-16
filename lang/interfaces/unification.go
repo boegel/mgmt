@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -24,8 +24,8 @@ import (
 )
 
 // Invariant represents a constraint that is described by the Expr's and Stmt's,
-// and which is passed into the unification solver to describe what is known
-// by the AST.
+// and which is passed into the unification solver to describe what is known by
+// the AST.
 type Invariant interface {
 	// TODO: should we add any other methods to this type?
 	fmt.Stringer

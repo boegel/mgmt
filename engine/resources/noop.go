@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -103,8 +103,8 @@ type NoopUID struct {
 	name string
 }
 
-// UIDs includes all params to make a unique identification of this object.
-// Most resources only return one, although some resources can return multiple.
+// UIDs includes all params to make a unique identification of this object. Most
+// resources only return one, although some resources can return multiple.
 func (obj *NoopRes) UIDs() []engine.ResUID {
 	x := &NoopUID{
 		BaseUID: engine.BaseUID{Name: obj.Name(), Kind: obj.Kind()},
@@ -126,8 +126,8 @@ func (obj *NoopRes) GroupCmp(r engine.GroupableRes) error {
 	return nil // noop resources can always be grouped together!
 }
 
-// UnmarshalYAML is the custom unmarshal handler for this struct.
-// It is primarily useful for setting the defaults.
+// UnmarshalYAML is the custom unmarshal handler for this struct. It is
+// primarily useful for setting the defaults.
 func (obj *NoopRes) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	type rawRes NoopRes // indirection to avoid infinite recursion
 

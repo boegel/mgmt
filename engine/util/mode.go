@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -215,15 +215,15 @@ func modeValueFrom(who string, modeType uint32) os.FileMode {
 
 // ParseSymbolicModes parses a slice of symbolic mode strings. By default it
 // will only accept the assignment input (=), but if allowAssign is true, then
-// all symbolic mode strings (=,+,-) can be used as well.
+// all symbolic mode strings (=, +, -) can be used as well.
 //
-// Symbolic mode is expected to be a string of who (user, group, other) then
-// the operation (=, +, -) then the change (read, write, execute, setuid,
-// setgid, sticky).
+// Symbolic mode is expected to be a string of who (user, group, other) then the
+// operation (=, +, -) then the change (read, write, execute, setuid, setgid,
+// sticky).
 //
 // Eg: ug=rw
 //
-// If you repeat yourself in the slice (ex. u=rw,u=w) ParseSymbolicModes will
+// If you repeat yourself in the slice (eg. u=rw,u=w) ParseSymbolicModes will
 // fail with an error.
 func ParseSymbolicModes(modes []string, from os.FileMode, allowAssign bool) (os.FileMode, error) {
 	symModes := make([]struct {

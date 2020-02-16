@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,8 @@ package interfaces
 import (
 	"context"
 
-	etcd "github.com/coreos/etcd/clientv3" // "clientv3"
-	pb "github.com/coreos/etcd/etcdserver/etcdserverpb"
+	etcd "go.etcd.io/etcd/clientv3" // "clientv3"
+	pb "go.etcd.io/etcd/etcdserver/etcdserverpb"
 )
 
 // WatcherData is the structure of data passed to a callback from any watcher.

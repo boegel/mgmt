@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -150,8 +150,8 @@ func (obj *Engine) Reversals() error {
 	}
 	// TODO: Do we want a way for stored reversals to add edges too?
 
-	// It would be great to ensure we didn't add any loops here, but instead
-	// of checking now, we'll move the check into the main loop.
+	// It would be great to ensure we didn't add any graph cycles here, but
+	// instead of checking now, we'll move the check into the main loop.
 	return nil
 }
 
@@ -291,5 +291,10 @@ func (obj *State) ReversalDelete() error {
 	}
 	file := path.Join(dir, ReverseFile) // return a unique file
 
-	return errwrap.Wrapf(os.Remove(file), "could not remove reverse state file")
+	// FIXME: why do we see these removals when there isn't a state file?
+	if err = os.Remove(file); os.IsNotExist(err) {
+		return nil // ignore missing files
+	}
+
+	return errwrap.Wrapf(err, "could not remove reverse state file")
 }

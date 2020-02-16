@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -66,8 +66,8 @@ func (obj *CPUCountFact) Init(init *facts.Init) error {
 }
 
 // Stream returns the changing values that this fact has over time. It will
-// first poll sysfs to get the initial cpu count, and then receives UEvents
-// from the kernel as CPUs are added/removed.
+// first poll sysfs to get the initial cpu count, and then receives UEvents from
+// the kernel as CPUs are added/removed.
 func (obj CPUCountFact) Stream() error {
 	defer close(obj.init.Output) // signal when we're done
 
@@ -88,6 +88,8 @@ func (obj CPUCountFact) Stream() error {
 	eventChan := make(chan *nlChanEvent) // updated in goroutine when we receive uevent
 	closeChan := make(chan struct{})     // channel to unblock selects in goroutine
 	defer close(closeChan)
+
+	var once bool // did we send at least once?
 
 	// wait for kernel to poke us about new device changes on the system
 	wg.Add(1)
@@ -121,6 +123,8 @@ func (obj CPUCountFact) Stream() error {
 			if err != nil {
 				obj.init.Logf("Could not get initial CPU count. Setting to zero.")
 			}
+			// TODO: would we rather error instead of sending zero?
+
 		case event, ok := <-eventChan:
 			if !ok {
 				continue
@@ -142,7 +146,7 @@ func (obj CPUCountFact) Stream() error {
 			return nil
 		}
 
-		if newCount == cpuCount {
+		if once && newCount == cpuCount {
 			continue
 		}
 		cpuCount = newCount
@@ -151,6 +155,7 @@ func (obj CPUCountFact) Stream() error {
 		case obj.init.Output <- &types.IntValue{
 			V: cpuCount,
 		}:
+			once = true
 			// send
 		case <-obj.closeChan:
 			return nil
@@ -173,8 +178,8 @@ func getCPUCount() (int64, error) {
 	return parseCPUList(string(dat))
 }
 
-// Parses a line of the form X,Y,Z,... where X,Y,Z can be either a single CPU or a
-// contiguous range of CPUs. e.g. "2,4-31,32-63". If there is an error parsing
+// Parses a line of the form X,Y,Z,... where X,Y,Z can be either a single CPU or
+// a contiguous range of CPUs. e.g. "2,4-31,32-63". If there is an error parsing
 // the line the function will return 0.
 func parseCPUList(list string) (int64, error) {
 	var count int64

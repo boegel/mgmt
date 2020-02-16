@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -31,8 +31,8 @@ func init() {
 	})
 }
 
-// Split splits the input string using the separator and returns the
-// segments as a list.
+// Split splits the input string using the separator and returns the segments as
+// a list.
 func Split(input []types.Value) (types.Value, error) {
 	str, sep := input[0].Str(), input[1].Str()
 

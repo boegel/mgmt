@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -118,7 +118,8 @@ func (obj *changedStep) Action() error {
 }
 func (obj *changedStep) Expect() error { return nil }
 
-// NewChangedStep waits up to this many ms for a CheckApply action to occur. Watch function to startup.
+// NewChangedStep waits up to this many ms for a CheckApply action to occur.
+// Watch function to startup.
 func NewChangedStep(ms uint, expect bool) Step {
 	return &changedStep{
 		ms:     ms,
@@ -227,7 +228,7 @@ func TestResources1(t *testing.T) {
 		p := "/tmp/whatever"
 		s := "hello, world\n"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		contents := s
 		res.Content = &contents
 
@@ -291,7 +292,7 @@ func TestResources1(t *testing.T) {
 		res := r.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/emptyfile"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 
 		timeline := []Step{
 			NewStartupStep(1000 * 60),      // startup
@@ -315,7 +316,7 @@ func TestResources1(t *testing.T) {
 		res := r.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/existingfile"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		content := "some existing text\n"
 
 		timeline := []Step{
@@ -810,14 +811,14 @@ func TestResources2(t *testing.T) {
 	testCases := []test{}
 	{
 		//file "/tmp/somefile" {
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//	content => "some new text\n",
 		//}
 		r1 := makeRes("file", "r1")
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		content := "some new text\n"
 		res.Content = &content
 
@@ -849,7 +850,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		//res.State = "exists" // not specified!
+		//res.State = FileStateExists // not specified!
 		content := "some new text\n"
 		res.Content = &content
 
@@ -882,7 +883,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		//res.State = "exists" // not specified!
+		//res.State = FileStateExists // not specified!
 		content := "some new text\n"
 		res.Content = &content
 
@@ -906,14 +907,14 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somefile" {
-		//	state => "absent",
+		//	state => $const.res.file.state.absent,
 		//}
 		// and no existing file exists!
 		r1 := makeRes("file", "r1")
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		res.State = "absent"
+		res.State = FileStateAbsent
 
 		timeline := []func() error{
 			fileRemove(p), // nothing here
@@ -935,14 +936,14 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somefile" {
-		//	state => "absent",
+		//	state => $const.res.file.state.absent,
 		//}
 		// and a file already exists!
 		r1 := makeRes("file", "r1")
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		res.State = "absent"
+		res.State = FileStateAbsent
 
 		timeline := []func() error{
 			fileWrite(p, "whatever"),
@@ -965,7 +966,7 @@ func TestResources2(t *testing.T) {
 	{
 		//file "/tmp/somefile" {
 		//	content => "some new text\n",
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//
 		//	Meta:reverse => true,
 		//}
@@ -973,7 +974,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		content := "some new text\n"
 		res.Content = &content
 		original := "this is the original state\n" // original state
@@ -1034,7 +1035,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		//res.State = "exists" // unspecified
+		//res.State = FileStateExists // unspecified
 		content := "some new text\n"
 		res.Content = &content
 		original := "this is the original state\n" // original state
@@ -1099,7 +1100,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		//res.State = "exists" // unspecified
+		//res.State = FileStateExists // unspecified
 		content := "some new text\n"
 		res.Content = &content
 		var r2 engine.Res // future reversed resource
@@ -1148,7 +1149,7 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somefile" {
-		//	state => "absent",
+		//	state => $const.res.file.state.absent,
 		//
 		//	Meta:reverse => true,
 		//}
@@ -1156,7 +1157,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		res.State = "absent"
+		res.State = FileStateAbsent
 		original := "this is the original state\n" // original state
 		var r2 engine.Res                          // future reversed resource
 
@@ -1206,7 +1207,7 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somefile" {
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//	fragments => [
 		//		"/tmp/frag1",
 		//		"/tmp/fragdir1/",
@@ -1219,7 +1220,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somefile"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		res.Fragments = []string{
 			"/tmp/frag1",
 			"/tmp/fragdir1/",
@@ -1271,7 +1272,7 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somefile" {
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//	source => "/tmp/somefiletocopy",
 		//}
 		r1 := makeRes("file", "r1")
@@ -1280,7 +1281,7 @@ func TestResources2(t *testing.T) {
 		p2 := "/tmp/somefiletocopy"
 		content := "hello this is some file to copy\n"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		res.Source = p2
 
 		timeline := []func() error{
@@ -1307,13 +1308,13 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somedir/" {
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//}
 		r1 := makeRes("file", "r1")
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somedir/"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 
 		timeline := []func() error{
 			fileAbsent(p), // ensure it's absent
@@ -1336,7 +1337,7 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somedir/" {
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//	source => /tmp/somedirtocopy/,
 		//	recurse => true,
 		//}
@@ -1345,7 +1346,7 @@ func TestResources2(t *testing.T) {
 		p := "/tmp/somedir/"
 		p2 := "/tmp/somedirtocopy/"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		res.Source = p2
 		res.Recurse = true
 
@@ -1407,7 +1408,7 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somedir/" {
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//	recurse => true,
 		//	purge => true,
 		//}
@@ -1415,7 +1416,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somedir/"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		res.Recurse = true
 		res.Purge = true
 
@@ -1473,7 +1474,7 @@ func TestResources2(t *testing.T) {
 	}
 	{
 		//file "/tmp/somedir/" {
-		//	state => "exists",
+		//	state => $const.res.file.state.exists,
 		//	recurse => true,
 		//	purge => true,
 		//}
@@ -1488,7 +1489,7 @@ func TestResources2(t *testing.T) {
 		res := r1.(*FileRes) // if this panics, the test will panic
 		p := "/tmp/somedir/"
 		res.Path = p
-		res.State = "exists"
+		res.State = FileStateExists
 		res.Recurse = true
 		res.Purge = true
 

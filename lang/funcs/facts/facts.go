@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -61,8 +61,8 @@ type Info struct {
 	Err    error       // did this fact validate?
 }
 
-// Init is the structure of values and references which is passed into all
-// facts on initialization.
+// Init is the structure of values and references which is passed into all facts
+// on initialization.
 type Init struct {
 	Hostname string // uuid for the host
 	//Noop bool

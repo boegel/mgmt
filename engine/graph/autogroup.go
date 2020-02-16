@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -74,10 +74,10 @@ func (obj *wrappedGrouper) VertexCmp(v1, v2 pgraph.Vertex) error {
 		return fmt.Errorf("v2 is not a GroupableRes")
 	}
 
-	if r1.Kind() != r2.Kind() { // we must group similar kinds
-		// TODO: maybe future resources won't need this limitation?
-		return fmt.Errorf("the two resources aren't the same kind")
-	}
+	// Some resources of different kinds can now group together!
+	//if r1.Kind() != r2.Kind() { // we must group similar kinds
+	//	return fmt.Errorf("the two resources aren't the same kind")
+	//}
 	// someone doesn't want to group!
 	if r1.AutoGroupMeta().Disabled || r2.AutoGroupMeta().Disabled {
 		return fmt.Errorf("one of the autogroup flags is false")

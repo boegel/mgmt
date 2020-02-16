@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,8 @@ import (
 	"github.com/purpleidea/mgmt/etcd/interfaces"
 	"github.com/purpleidea/mgmt/util/errwrap"
 
-	etcd "github.com/coreos/etcd/clientv3"
-	etcdutil "github.com/coreos/etcd/clientv3/clientv3util"
+	etcd "go.etcd.io/etcd/clientv3"
+	etcdutil "go.etcd.io/etcd/clientv3/clientv3util"
 )
 
 const (
@@ -128,7 +128,8 @@ func calculateMax(deploys map[uint64]string) uint64 {
 // GetDeploy returns the deploy with the specified id if it exists. If you input
 // an id of 0, you'll get back an empty deploy without error. This is useful so
 // that you can pass through this function easily.
-// FIXME: implement this more efficiently so that it doesn't have to download *all* the old deploys from etcd!
+// FIXME: implement this more efficiently so that it doesn't have to download
+// *all* the old deploys from etcd!
 func (obj *SimpleDeploy) GetDeploy(ctx context.Context, id uint64) (string, error) {
 	result, err := obj.GetDeploys(ctx)
 	if err != nil {

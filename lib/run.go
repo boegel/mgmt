@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ import (
 
 // run is the main run target.
 func run(c *cli.Context, name string, gapiObj gapi.GAPI) error {
-	cliContext := c.Parent() // these are the flags from `run`
+	cliContext := c.Lineage()[1] // these are the flags from `run`
 	if cliContext == nil {
 		return fmt.Errorf("could not get cli context")
 	}

@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@ import (
 	"github.com/purpleidea/mgmt/etcd/interfaces"
 	"github.com/purpleidea/mgmt/util"
 
-	etcd "github.com/coreos/etcd/clientv3"
+	etcd "go.etcd.io/etcd/clientv3"
 )
 
 const (
@@ -114,11 +114,11 @@ func SetResources(ctx context.Context, client interfaces.Client, hostname string
 	return err
 }
 
-// GetResources collects all of the resources which match a filter from etcd.
-// If the kindfilter or hostnameFilter is empty, then it assumes no filtering...
+// GetResources collects all of the resources which match a filter from etcd. If
+// the kindfilter or hostnameFilter is empty, then it assumes no filtering...
 // TODO: Expand this with a more powerful filter based on what we eventually
 // support in our collect DSL. Ideally a server side filter like WithFilter()
-// We could do this if the pattern was $NS/exported/$kind/$hostname/$uid = $data.
+// could do this if the pattern was $NS/exported/$kind/$hostname/$uid = $data.
 func GetResources(ctx context.Context, client interfaces.Client, hostnameFilter, kindFilter []string) ([]engine.Res, error) {
 	// key structure is $NS/exported/$hostname/resources/$uid = $data
 	path := fmt.Sprintf("%s/exported/", ns)

@@ -1,5 +1,5 @@
 # Mgmt
-# Copyright (C) 2013-2019+ James Shubin and the project contributors
+# Copyright (C) 2013-2020+ James Shubin and the project contributors
 # Written by James Shubin <james@shubin.ca> and the project contributors
 #
 # This program is free software: you can redistribute it and/or modify
@@ -186,6 +186,7 @@ crossbuild_targets = $(addprefix build/mgmt-,$(subst /,-,${GOOSARCHES}))
 crossbuild: ${crossbuild_targets}
 
 clean: ## clean things up
+	$(MAKE) --quiet -C test clean
 	$(MAKE) --quiet -C bindata clean
 	$(MAKE) --quiet -C lang/funcs clean
 	$(MAKE) --quiet -C lang clean
@@ -199,6 +200,8 @@ clean: ## clean things up
 	rm -f build/mgmt-*
 
 test: build ## run tests
+	@# recursively run make in child dir named test
+	@$(MAKE) --quiet -C test
 	./test.sh
 
 # create all test targets for make tab completion (eg: make test-gofmt)
@@ -511,6 +514,6 @@ funcgen: lang/funcs/core/generated_funcs.go
 
 lang/funcs/core/generated_funcs.go: lang/funcs/funcgen/*.go lang/funcs/core/funcgen.yaml lang/funcs/funcgen/templates/generated_funcs.go.tpl
 	@echo "Generating: funcs..."
-	@go run `find lang/funcs/funcgen/ -maxdepth 1 -type f -name '*.go' -not -name '*_test.go'` -templates=lang/funcs/funcgen/templates/generated_funcs.go.tpl 2>/dev/null
+	@go run `find lang/funcs/funcgen/ -maxdepth 1 -type f -name '*.go' -not -name '*_test.go'` -templates=lang/funcs/funcgen/templates/generated_funcs.go.tpl >/dev/null
 
 # vim: ts=8

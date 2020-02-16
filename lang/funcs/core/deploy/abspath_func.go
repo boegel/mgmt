@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -43,8 +43,8 @@ type AbsPathFunc struct {
 	data *interfaces.FuncData
 	last types.Value // last value received to use for diff
 
-	path   string // the active path
-	result string // last calculated output
+	path   *string // the active path
+	result *string // last calculated output
 
 	closeChan chan struct{}
 }
@@ -110,10 +110,10 @@ func (obj *AbsPathFunc) Stream() error {
 
 			path := input.Struct()[pathArg].Str()
 			// TODO: add validation for absolute path?
-			if path == obj.path {
+			if obj.path != nil && *obj.path == path {
 				continue // nothing changed
 			}
-			obj.path = path
+			obj.path = &path
 
 			p := strings.TrimSuffix(obj.data.Base, "/")
 			if p == obj.data.Base { // didn't trim, so we fail
@@ -122,18 +122,18 @@ func (obj *AbsPathFunc) Stream() error {
 			}
 			result := p
 
-			if obj.path == "" {
+			if *obj.path == "" {
 				result += "/" // add the above trailing slash back
-			} else if !strings.HasPrefix(obj.path, "/") {
-				return fmt.Errorf("path was not absolute, got: `%s`", obj.path)
+			} else if !strings.HasPrefix(*obj.path, "/") {
+				return fmt.Errorf("path was not absolute, got: `%s`", *obj.path)
 				//result += "/" // be forgiving ?
 			}
-			result += obj.path
+			result += *obj.path
 
-			if obj.result == result {
+			if obj.result != nil && *obj.result == result {
 				continue // result didn't change
 			}
-			obj.result = result // store new result
+			obj.result = &result // store new result
 
 		case <-obj.closeChan:
 			return nil
@@ -141,7 +141,7 @@ func (obj *AbsPathFunc) Stream() error {
 
 		select {
 		case obj.init.Output <- &types.StrValue{
-			V: obj.result,
+			V: *obj.result,
 		}:
 		case <-obj.closeChan:
 			return nil

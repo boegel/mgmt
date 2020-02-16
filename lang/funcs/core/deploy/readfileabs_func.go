@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -40,8 +40,8 @@ type ReadFileAbsFunc struct {
 	data *interfaces.FuncData
 	last types.Value // last value received to use for diff
 
-	filename string // the active filename
-	result   string // last calculated output
+	filename *string // the active filename
+	result   *string // last calculated output
 
 	closeChan chan struct{}
 }
@@ -107,28 +107,29 @@ func (obj *ReadFileAbsFunc) Stream() error {
 
 			filename := input.Struct()["filename"].Str()
 			// TODO: add validation for absolute path?
-			if filename == obj.filename {
+			// TODO: add check for empty string
+			if obj.filename != nil && *obj.filename == filename {
 				continue // nothing changed
 			}
-			obj.filename = filename
+			obj.filename = &filename
 
 			fs, err := obj.init.World.Fs(obj.data.FsURI) // open the remote file system
 			if err != nil {
 				return errwrap.Wrapf(err, "can't load code from file system `%s`", obj.data.FsURI)
 			}
-			content, err := fs.ReadFile(obj.filename) // open the remote file system
+			content, err := fs.ReadFile(*obj.filename) // open the remote file system
 			// We could use it directly, but it feels like less correct.
-			//content, err := obj.data.Fs.ReadFile(obj.filename) // open the remote file system
+			//content, err := obj.data.Fs.ReadFile(*obj.filename) // open the remote file system
 			if err != nil {
-				return errwrap.Wrapf(err, "can't read file `%s`", obj.filename)
+				return errwrap.Wrapf(err, "can't read file `%s`", *obj.filename)
 			}
 
 			result := string(content) // convert to string
 
-			if obj.result == result {
+			if obj.result != nil && *obj.result == result {
 				continue // result didn't change
 			}
-			obj.result = result // store new result
+			obj.result = &result // store new result
 
 		case <-obj.closeChan:
 			return nil
@@ -136,7 +137,7 @@ func (obj *ReadFileAbsFunc) Stream() error {
 
 		select {
 		case obj.init.Output <- &types.StrValue{
-			V: obj.result,
+			V: *obj.result,
 		}:
 		case <-obj.closeChan:
 			return nil

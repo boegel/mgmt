@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -68,7 +68,8 @@ type AutoEdge interface {
 	Test([]bool) bool // call until false
 }
 
-// ResUID is a unique identifier for a resource, namely it's name, and the kind ("type").
+// ResUID is a unique identifier for a resource, namely it's name, and the kind
+// ("type").
 type ResUID interface {
 	fmt.Stringer // String() string
 
@@ -104,9 +105,9 @@ func (obj *BaseUID) String() string {
 }
 
 // IFF looks at two UID's and if and only if they are equivalent, returns true.
-// If they are not equivalent, it returns false.
-// Most resources will want to override this method, since it does the important
-// work of actually discerning if two resources are identical in function.
+// If they are not equivalent, it returns false. Most resources will want to
+// override this method, since it does the important work of actually discerning
+// if two resources are identical in function.
 func (obj *BaseUID) IFF(uid ResUID) bool {
 	res, ok := uid.(*BaseUID)
 	if !ok {

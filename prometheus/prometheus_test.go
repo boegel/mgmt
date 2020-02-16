@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// TestInitKindMetrics tests that we are initializing the Prometheus
-// metrics correctly for all kind of resources.
+// TestInitKindMetrics tests that we are initializing the Prometheus metrics
+// correctly for all kinds of resources.
 func TestInitKindMetrics(t *testing.T) {
 	var prom Prometheus
 	prom.Init()

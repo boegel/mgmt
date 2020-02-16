@@ -1,5 +1,5 @@
 // Mgmt
-// Copyright (C) 2013-2019+ James Shubin and the project contributors
+// Copyright (C) 2013-2020+ James Shubin and the project contributors
 // Written by James Shubin <james@shubin.ca> and the project contributors
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,8 @@ import (
 	"github.com/purpleidea/mgmt/util"
 	"github.com/purpleidea/mgmt/util/errwrap"
 
-	"github.com/coreos/etcd/embed"
-	etcdtypes "github.com/coreos/etcd/pkg/types"
+	"go.etcd.io/etcd/embed"
+	etcdtypes "go.etcd.io/etcd/pkg/types"
 )
 
 const (
@@ -143,8 +143,11 @@ func (obj *EmbdEtcd) runServer(newCluster bool, peerURLsMap etcdtypes.URLsMap) (
 	cfg.LCUrls = obj.ClientURLs
 	cfg.APUrls = aPUrls
 	cfg.ACUrls = aCUrls
-	cfg.StrictReconfigCheck = false // XXX: workaround https://github.com/coreos/etcd/issues/6305
+	cfg.StrictReconfigCheck = false // XXX: workaround https://github.com/etcd-io/etcd/issues/6305
 	cfg.MaxTxnOps = DefaultMaxTxnOps
+	cfg.Logger = "zap"
+	//cfg.LogOutputs = []string{} // FIXME: add a way to pass in our logf func
+	cfg.LogLevel = "error" // keep things quieter for now
 
 	cfg.InitialCluster = initialPeerURLsMap.String() // including myself!
 	if newCluster {
